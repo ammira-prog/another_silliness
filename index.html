@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sealed Scroll</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Georgia', serif;
+  background: radial-gradient(circle at top, #2b1d0e, #0f0a05);
+  color: #f5e6c8;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+.container {
+  padding: 30px;
+}
+
+h1 {
+  font-size: 22px;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+
+.symbols, .letters {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.symbol, .letter {
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(255, 215, 140, 0.1);
+  border: 1px solid rgba(255, 215, 140, 0.3);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.symbol:hover, .letter:hover {
+  transform: scale(1.05);
+  background: rgba(255, 215, 140, 0.25);
+}
+
+#phrase {
+  margin-top: 20px;
+  font-size: 18px;
+  letter-spacing: 2px;
+}
+
+.hidden {
+  display: none;
+}
+
+button {
+  margin-top: 25px;
+  padding: 12px 20px;
+  background: linear-gradient(45deg, #d4af37, #fceabb);
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.scroll {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f1d4;
+  color: #3b2a14;
+  border-radius: 12px;
+  animation: fadeIn 1s ease;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>traveler... decode the ancient inscription</h1>
+
+<div class="symbols">
+  <div class="symbol" data="S">𓂀</div>
+  <div class="symbol" data="E">𓋹</div>
+  <div class="symbol" data="E">𓆣</div>
+  <div class="symbol" data="K">𓃭</div>
+</div>
+
+<div class="letters">
+  <div class="letter">S</div>
+  <div class="letter">E</div>
+  <div class="letter">K</div>
+</div>
+
+<div id="phrase">_ _ _ _</div>
+
+<button id="unlock" class="hidden">open the sealed scroll</button>
+
+<div id="scroll" class="scroll hidden">
+hidden message decoded:
+
+i think my heart has already made its choice.
+i’m not holding back anymore.
+i’m going all in on what i feel for you.
+i’m hoping you’re the one.
+and if october brings us somewhere beautiful, i’ll be grateful.
+if not, then at least you’ll never have to wonder whether you were gently loved and cared for, with my whole heart.
+</div>
+
+</div>
+
+<audio id="tapSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7e7b7a.mp3?filename=click-124467.mp3"></audio>
+<audio id="successSound" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_6c4b4e.mp3?filename=success-1-6297.mp3"></audio>
+
+<script>
+let selected = null;
+let progress = "";
+
+document.querySelectorAll(".symbol").forEach(sym => {
+  sym.onclick = () => {
+    selected = sym.dataset;
+    document.getElementById("tapSound").play();
+  }
+});
+
+document.querySelectorAll(".letter").forEach(letter => {
+  letter.onclick = () => {
+    if (!selected) return;
+
+    document.getElementById("tapSound").play();
+
+    if (letter.innerText === selected) {
+      progress += selected;
+      document.getElementById("phrase").innerText = progress.padEnd(4, "_");
+
+      if (progress === "SEEK") {
+        document.getElementById("successSound").play();
+        document.getElementById("unlock").classList.remove("hidden");
+      }
+    }
+
+    selected = null;
+  }
+});
+
+document.getElementById("unlock").onclick = () => {
+  document.getElementById("scroll").classList.remove("hidden");
+};
+</script>
+
+</body>
+</html>
