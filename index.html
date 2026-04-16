@@ -1,164 +1,337 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sealed Scroll</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sealed Scroll</title>
 
-<style>
-body {
-  margin: 0;
-  font-family: 'Georgia', serif;
-  background: radial-gradient(circle at top, #2b1d0e, #0f0a05);
-  color: #f5e6c8;
-  text-align: center;
-  overflow-x: hidden;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-.container {
-  padding: 30px;
-}
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      font-family: Georgia, serif;
+      background: radial-gradient(circle at top, #2b1a0d 0%, #120904 60%, #090402 100%);
+      color: #f6e7c7;
+      overflow-x: hidden;
+    }
 
-h1 {
-  font-size: 22px;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-}
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      -webkit-user-select: none;
+      user-select: none;
+    }
 
-.symbols, .letters {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 15px 0;
-}
+    .container {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
 
-.symbol, .letter {
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: rgba(255, 215, 140, 0.1);
-  border: 1px solid rgba(255, 215, 140, 0.3);
-  cursor: pointer;
-  transition: 0.2s;
-}
+    h1 {
+      font-size: 20px;
+      line-height: 1.2;
+      margin: 0 0 28px;
+      letter-spacing: 0.5px;
+      color: #f7e7c3;
+      text-shadow: 0 0 10px rgba(255, 215, 140, 0.08);
+    }
 
-.symbol:hover, .letter:hover {
-  transform: scale(1.05);
-  background: rgba(255, 215, 140, 0.25);
-}
+    .symbols,
+    .letters {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
 
-#phrase {
-  margin-top: 20px;
-  font-size: 18px;
-  letter-spacing: 2px;
-}
+    .symbol,
+    .letter {
+      width: 78px;
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+      border: 1px solid rgba(236, 199, 118, 0.35);
+      background: rgba(255, 220, 150, 0.08);
+      color: #f6e7c7;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+    }
 
-.hidden {
-  display: none;
-}
+    .symbol {
+      font-size: 30px;
+    }
 
-button {
-  margin-top: 25px;
-  padding: 12px 20px;
-  background: linear-gradient(45deg, #d4af37, #fceabb);
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
+    .letter {
+      font-size: 22px;
+    }
 
-.scroll {
-  margin-top: 30px;
-  padding: 20px;
-  background: #f8f1d4;
-  color: #3b2a14;
-  border-radius: 12px;
-  animation: fadeIn 1s ease;
-  line-height: 1.6;
-  white-space: pre-line;
-}
+    .symbol:hover,
+    .letter:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 14px rgba(255, 215, 140, 0.28);
+      background: rgba(255, 220, 150, 0.13);
+    }
 
-@keyframes fadeIn {
-  from {opacity: 0; transform: translateY(20px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-</style>
+    .symbol:active,
+    .letter:active {
+      transform: scale(0.98);
+    }
+
+    .selected {
+      border-color: rgba(255, 222, 148, 0.95);
+      background: rgba(255, 220, 150, 0.18);
+      box-shadow: 0 0 18px rgba(255, 215, 140, 0.45);
+    }
+
+    .solved {
+      border-color: rgba(255, 222, 148, 0.9);
+      background: rgba(255, 220, 150, 0.18);
+      box-shadow: 0 0 18px rgba(255, 215, 140, 0.32);
+      opacity: 0.72;
+    }
+
+    .wrong {
+      animation: shake 0.22s ease;
+    }
+
+    #phrase {
+      font-size: 28px;
+      letter-spacing: 8px;
+      margin: 10px 0 22px;
+      min-height: 40px;
+      color: #f6e7c7;
+    }
+
+    #hint {
+      font-size: 13px;
+      color: rgba(246, 231, 199, 0.72);
+      margin-bottom: 18px;
+      min-height: 20px;
+      letter-spacing: 0.2px;
+    }
+
+    button {
+      margin-top: 8px;
+      padding: 13px 22px;
+      border: none;
+      border-radius: 999px;
+      font-size: 15px;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      color: #3d2a12;
+      background: linear-gradient(135deg, #d9b14a, #f7e6b2);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+      transition: transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 18px rgba(255, 215, 140, 0.25);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .scroll {
+      margin-top: 26px;
+      padding: 24px 22px;
+      background: linear-gradient(180deg, #f6ebc8, #ead7aa);
+      color: #4a3219;
+      border-radius: 18px;
+      line-height: 1.75;
+      white-space: pre-line;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+      animation: fadeInUp 0.9s ease;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-3px); }
+      100% { transform: translateX(0); }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 380px) {
+      .symbol,
+      .letter {
+        width: 72px;
+        height: 72px;
+      }
+
+      .symbol {
+        font-size: 28px;
+      }
+
+      .letter {
+        font-size: 20px;
+      }
+
+      #phrase {
+        font-size: 24px;
+        letter-spacing: 7px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <h1>traveler... decode the ancient inscription</h1>
 
-<div class="container">
+    <div class="symbols">
+      <div class="symbol" data-index="0" data-letter="S">𓂀</div>
+      <div class="symbol" data-index="1" data-letter="E">𓋹</div>
+      <div class="symbol" data-index="2" data-letter="E">𓆣</div>
+      <div class="symbol" data-index="3" data-letter="K">𓃭</div>
+    </div>
 
-<h1>traveler... decode the ancient inscription</h1>
+    <div class="letters">
+      <div class="letter" data-letter="S">S</div>
+      <div class="letter" data-letter="E">E</div>
+      <div class="letter" data-letter="K">K</div>
+    </div>
 
-<div class="symbols">
-  <div class="symbol" data="S">𓂀</div>
-  <div class="symbol" data="E">𓋹</div>
-  <div class="symbol" data="E">𓆣</div>
-  <div class="symbol" data="K">𓃭</div>
-</div>
+    <div id="phrase">_ _ _ _</div>
+    <div id="hint">tap a symbol, then tap its matching letter</div>
 
-<div class="letters">
-  <div class="letter">S</div>
-  <div class="letter">E</div>
-  <div class="letter">K</div>
-</div>
+    <button id="unlock" class="hidden">open the sealed scroll…</button>
 
-<div id="phrase">_ _ _ _</div>
-
-<button id="unlock" class="hidden">open the sealed scroll</button>
-
-<div id="scroll" class="scroll hidden">
-hidden message decoded:
+    <div id="scroll" class="scroll hidden">hidden message decoded:
 
 i think my heart has already made its choice.
 i’m not holding back anymore.
 i’m going all in on what i feel for you.
 i’m hoping you’re the one.
 and if october brings us somewhere beautiful, i’ll be grateful.
-if not, then at least you’ll never have to wonder whether you were gently loved and cared for, with my whole heart.
-</div>
+if not, then at least you’ll never have to wonder whether you were gently loved and cared for, with my whole heart.</div>
+  </div>
 
-</div>
+  <audio id="tapSound" preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7e7b7a.mp3?filename=click-124467.mp3" type="audio/mpeg">
+  </audio>
 
-<audio id="tapSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c7e7b7a.mp3?filename=click-124467.mp3"></audio>
-<audio id="successSound" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_6c4b4e.mp3?filename=success-1-6297.mp3"></audio>
+  <audio id="successSound" preload="auto">
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_6c4b4e.mp3?filename=success-1-6297.mp3" type="audio/mpeg">
+  </audio>
 
-<script>
-let selected = null;
-let progress = "";
+  <script>
+    const symbols = document.querySelectorAll(".symbol");
+    const letters = document.querySelectorAll(".letter");
+    const phraseEl = document.getElementById("phrase");
+    const hintEl = document.getElementById("hint");
+    const unlockBtn = document.getElementById("unlock");
+    const scrollEl = document.getElementById("scroll");
+    const tapSound = document.getElementById("tapSound");
+    const successSound = document.getElementById("successSound");
 
-document.querySelectorAll(".symbol").forEach(sym => {
-  sym.onclick = () => {
-    selected = sym.dataset;
-    document.getElementById("tapSound").play();
-  }
-});
+    const solved = ["_", "_", "_", "_"];
+    let activeSymbol = null;
+    let completed = false;
 
-document.querySelectorAll(".letter").forEach(letter => {
-  letter.onclick = () => {
-    if (!selected) return;
+    function playSound(audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
 
-    document.getElementById("tapSound").play();
+    function updatePhrase() {
+      phraseEl.textContent = solved.join(" ");
 
-    if (letter.innerText === selected) {
-      progress += selected;
-      document.getElementById("phrase").innerText = progress.padEnd(4, "_");
-
-      if (progress === "SEEK") {
-        document.getElementById("successSound").play();
-        document.getElementById("unlock").classList.remove("hidden");
+      if (!completed && solved.join("") === "SEEK") {
+        completed = true;
+        hintEl.textContent = "the inscription is complete...";
+        unlockBtn.classList.remove("hidden");
+        playSound(successSound);
       }
     }
 
-    selected = null;
-  }
-});
+    symbols.forEach(symbol => {
+      symbol.addEventListener("click", () => {
+        if (symbol.classList.contains("solved")) return;
 
-document.getElementById("unlock").onclick = () => {
-  document.getElementById("scroll").classList.remove("hidden");
-};
-</script>
+        symbols.forEach(s => s.classList.remove("selected"));
+        activeSymbol = symbol;
+        symbol.classList.add("selected");
+        hintEl.textContent = "now choose its matching letter";
+        playSound(tapSound);
+      });
+    });
 
+    letters.forEach(letter => {
+      letter.addEventListener("click", () => {
+        if (!activeSymbol || completed && activeSymbol.classList.contains("solved")) return;
+
+        playSound(tapSound);
+
+        const chosen = letter.dataset.letter;
+        const correct = activeSymbol.dataset.letter;
+        const idx = Number(activeSymbol.dataset.index);
+
+        if (chosen === correct) {
+          solved[idx] = correct;
+          activeSymbol.classList.remove("selected");
+          activeSymbol.classList.add("solved");
+          activeSymbol = null;
+          hintEl.textContent = completed ? "the way is open..." : "correct...";
+          updatePhrase();
+        } else {
+          letter.classList.add("wrong");
+          activeSymbol.classList.add("wrong");
+          hintEl.textContent = "that symbol asks for a different letter";
+
+          setTimeout(() => {
+            letter.classList.remove("wrong");
+            if (activeSymbol) activeSymbol.classList.remove("wrong");
+          }, 220);
+        }
+      });
+    });
+
+    unlockBtn.addEventListener("click", () => {
+      playSound(successSound);
+      scrollEl.classList.remove("hidden");
+      unlockBtn.classList.add("hidden");
+      hintEl.textContent = "the sealed scroll opens...";
+      scrollEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  </script>
 </body>
 </html>
