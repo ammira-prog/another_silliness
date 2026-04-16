@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sealed Scroll</title>
-
   <style>
     * {
       box-sizing: border-box;
@@ -20,7 +19,6 @@
       font-family: Georgia, serif;
       -webkit-user-select: none;
       user-select: none;
-      overflow-x: hidden;
     }
 
     body {
@@ -32,20 +30,19 @@
       width: 100%;
       max-width: 460px;
       min-height: 100vh;
-      padding: 42px 20px 40px;
+      padding: 40px 20px;
       text-align: center;
     }
 
     h1 {
       margin: 0 0 10px;
-      font-size: 19px;
-      line-height: 1.2;
+      font-size: 20px;
     }
 
     .sub {
+      margin-bottom: 24px;
       font-size: 13px;
       opacity: 0.75;
-      margin-bottom: 24px;
     }
 
     .phrase-grid {
@@ -53,11 +50,10 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
-    .slot,
-    .letter {
+    .slot, .letter {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -67,8 +63,6 @@
       border-radius: 14px;
       cursor: pointer;
       transition: 0.18s ease;
-      -webkit-user-select: none;
-      user-select: none;
       -webkit-touch-callout: none;
       touch-action: manipulation;
     }
@@ -84,18 +78,6 @@
       height: 60px;
     }
 
-    .slot:hover,
-    .letter:hover {
-      transform: scale(1.03);
-      box-shadow: 0 0 14px rgba(255, 215, 140, 0.20);
-    }
-
-    .slot:active,
-    .letter:active,
-    button:active {
-      transform: scale(0.98);
-    }
-
     .selected {
       box-shadow: 0 0 14px rgba(255, 215, 140, 0.42);
       border-color: rgba(255, 222, 148, 0.95);
@@ -103,15 +85,11 @@
     }
 
     .solved {
-      opacity: 0.72;
-    }
-
-    .wrong {
-      animation: shake 0.22s ease;
+      opacity: 0.7;
     }
 
     .decoded {
-      min-height: 34px;
+      min-height: 32px;
       margin: 10px 0;
       font-size: 20px;
       letter-spacing: 2px;
@@ -148,8 +126,6 @@
       font-family: Georgia, serif;
       font-size: 15px;
       cursor: pointer;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-      transition: 0.18s ease;
     }
 
     .hidden {
@@ -164,29 +140,152 @@
       border-radius: 16px;
       line-height: 1.7;
       white-space: pre-line;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
       text-align: center;
-      animation: fadeInUp 0.7s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>traveler... decode the ancient inscription</h1>
+    <div class="sub">each symbol holds a hidden truth</div>
+
+    <div id="grid" class="phrase-grid"></div>
+
+    <div id="decoded" class="decoded"></div>
+    <div id="hint">tap a symbol, then its matching letter</div>
+
+    <div id="letters" class="letters"></div>
+
+    <button id="unlock" class="hidden">open the sealed scroll...</button>
+
+    <div id="scroll" class="scroll hidden">hidden message decoded:
+
+i think my heart has already made its choice.
+i'm not holding back anymore.
+i'm going all in on what i feel for you.
+i'm hoping you're the one.
+and wherever october leads us, i'll be grateful for what's been real between us.
+but no matter what happens, i hope you never doubt that you were gently loved and cared for, with my whole heart.</div>
+  </div>
+
+  <script>
+    const phrase = "SEEK THE HIDDEN TRUTH";
+
+    const symbolMap = {
+      S: "𓋴",
+      E: "𓂀",
+      K: "𓎡",
+      T: "𓏏",
+      H: "𓉔",
+      I: "𓇋",
+      D: "𓆓",
+      N: "𓈖",
+      R: "𓂋",
+      U: "𓅱"
+    };
+
+    const letterBank = ["S", "E", "K", "T", "H", "I", "D", "N", "R", "U"];
+
+    const grid = document.getElementById("grid");
+    const decoded = document.getElementById("decoded");
+    const hint = document.getElementById("hint");
+    const lettersWrap = document.getElementById("letters");
+    const unlockBtn = document.getElementById("unlock");
+    const scroll = document.getElementById("scroll");
+
+    let activeSlot = null;
+    let finished = false;
+
+    const phraseChars = phrase.split("");
+    const solved = phraseChars.map(function(char) {
+      return char === " " ? " " : "_";
+    });
+
+    function renderGrid() {
+      grid.innerHTML = "";
+
+      phraseChars.forEach(function(char, index) {
+        if (char === " ") {
+          const space = document.createElement("div");
+          space.className = "space";
+          grid.appendChild(space);
+          return;
+        }
+
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        slot.dataset.index = index;
+        slot.dataset.letter = char;
+        slot.textContent = symbolMap[char];
+
+        slot.addEventListener("click", function() {
+          if (slot.classList.contains("solved")) return;
+
+          const allSlots = document.querySelectorAll(".slot");
+          allSlots.forEach(function(s) {
+            s.classList.remove("selected");
+          });
+
+          slot.classList.add("selected");
+          activeSlot = slot;
+          hint.textContent = "now choose the matching letter";
+        });
+
+        grid.appendChild(slot);
+      });
     }
 
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-4px); }
-      50% { transform: translateX(4px); }
-      75% { transform: translateX(-3px); }
-      100% { transform: translateX(0); }
+    function renderLetters() {
+      lettersWrap.innerHTML = "";
+
+      letterBank.forEach(function(letter) {
+        const tile = document.createElement("div");
+        tile.className = "letter";
+        tile.textContent = letter;
+        tile.dataset.letter = letter;
+
+        tile.addEventListener("click", function() {
+          if (!activeSlot || finished) return;
+
+          const chosen = tile.dataset.letter;
+          const correct = activeSlot.dataset.letter;
+          const idx = Number(activeSlot.dataset.index);
+
+          if (chosen === correct) {
+            solved[idx] = correct;
+            activeSlot.classList.remove("selected");
+            activeSlot.classList.add("solved");
+            activeSlot = null;
+            hint.textContent = "correct...";
+            updateDecoded();
+          } else {
+            hint.textContent = "that symbol asks for a different letter";
+          }
+        });
+
+        lettersWrap.appendChild(tile);
+      });
     }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
+    function updateDecoded() {
+      decoded.textContent = solved.join("");
+
+      if (!finished && solved.join("") === phrase) {
+        finished = true;
+        hint.textContent = "the inscription is complete...";
+        unlockBtn.classList.remove("hidden");
       }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
-    @media (max-width: 380px) {
-      .slot {
+    unlockBtn.addEventListener("click", function() {
+      scroll.classList.remove("hidden");
+      unlockBtn.classList.add("hidden");
+      hint.textContent = "the sealed scroll opens...";
+    });
+
+    renderGrid();
+    renderLetters();
+    updateDecoded();
+  </script>
+</body>
+      </html>
